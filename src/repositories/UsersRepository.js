@@ -16,7 +16,7 @@ class UsersRepository {
       [name, email, password]
     );
 
-    return { id: userId };
+    return userId;
   }
   async findByUser(user_id) {
     const database = await sqliteConnection();
