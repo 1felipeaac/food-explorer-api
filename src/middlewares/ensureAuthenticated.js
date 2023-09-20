@@ -9,6 +9,7 @@ function ensureAuthenticated(request, response, next) {
     throw new AppError("JWT token não informado", 401);
   }
 
+  // console.log(authHeader)
   const [, token] = authHeader.split(" ");
 
   try {

@@ -1,6 +1,6 @@
 const sqliteConnection = require("../database/sqlite");
 
-class UserRepository {
+class UsersRepository {
   async findByEmail(email) {
     const database = await sqliteConnection();
     const user = await database.get("SELECT * FROM  users WHERE email = (?)", [
@@ -47,4 +47,4 @@ class UserRepository {
   }
 }
 
-module.exports = UserRepository;
+module.exports = UsersRepository;
