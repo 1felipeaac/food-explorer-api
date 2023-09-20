@@ -1,8 +1,8 @@
 const { hash } = require("bcryptjs");
-const AppError = require("../utils/AppError");
 const { compare } = require("bcryptjs");
+const AppError = require("../utils/AppError");
 
-class UserCreateService {
+class UsersService {
   constructor(userRepository) {
     this.userRepository = userRepository;
   }
@@ -38,7 +38,7 @@ class UserCreateService {
       throw new AppError("Este email já está em uso.");
     }
 
-    console.log(`senha antiga: ${old_password}, senha nova: ${password}`);
+    // console.log(`senha antiga: ${old_password}, senha nova: ${password}`);
 
     user.name = name ?? user.name; // '??' = nullish operator
     user.email = email ?? user.email;
@@ -58,7 +58,7 @@ class UserCreateService {
       user.password = await hash(password, 8);
     }
 
-    console.log(user);
+    // console.log(user);
     const userUpdated = await this.userRepository.update(
       user.name,
       user.email,
@@ -70,4 +70,4 @@ class UserCreateService {
   }
 }
 
-module.exports = UserCreateService;
+module.exports = UsersService;

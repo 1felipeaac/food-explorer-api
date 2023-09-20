@@ -9,14 +9,16 @@ function ensureAuthenticated(request, response, next) {
     throw new AppError("JWT token não informado", 401);
   }
 
+  // console.log(authHeader)
   const [, token] = authHeader.split(" ");
 
   try {
-    const { sub: user_id } = verify(token, authConfig.jwt.secret);
+    const {role,  sub: user_id } = verify(token, authConfig.jwt.secret);
 
 
     request.user = {
       id: Number(user_id),
+      role
     };
     
     return next();
