@@ -8,6 +8,15 @@ class UserRepository {
     ]);
     return user;
   }
+  async findByUser(user_id) {
+    const database = await sqliteConnection();
+
+    const user = await database.get("SELECT * FROM users WHERE id = (?)", [
+      user_id,
+    ]);
+
+    return user;
+  }
   async create({ name, email, password }) {
     const database = await sqliteConnection();
 
@@ -17,15 +26,6 @@ class UserRepository {
     );
 
     return { id: userId };
-  }
-  async findByUser(user_id) {
-    const database = await sqliteConnection();
-
-    const user = await database.get("SELECT * FROM users WHERE id = (?)", [
-      user_id,
-    ]);
-
-    return user;
   }
 
   async update(name, email, password, id) {
