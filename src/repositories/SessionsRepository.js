@@ -1,6 +1,4 @@
-const sqliteConnection = require("../database/sqlite");
 const knex = require("../database/knex");
-
 
 class SessionRepository{
     async checkEmail(email) {

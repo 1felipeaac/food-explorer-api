@@ -38,8 +38,6 @@ class UsersService {
       throw new AppError("Este email já está em uso.");
     }
 
-    // console.log(`senha antiga: ${old_password}, senha nova: ${password}`);
-
     user.name = name ?? user.name; // '??' = nullish operator
     user.email = email ?? user.email;
     if (password && !old_password) {
@@ -58,7 +56,6 @@ class UsersService {
       user.password = await hash(password, 8);
     }
 
-    // console.log(user);
     const userUpdated = await this.userRepository.update(
       user.name,
       user.email,

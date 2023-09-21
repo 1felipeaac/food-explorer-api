@@ -1,35 +1,29 @@
-const knex = require('../database/knex');
+const knex = require("../database/knex");
+const DishesRepository = require("../repositories/DishesRepository");
+const DishesService = require("../services/DishesService");
 
-class DishesController{
+class DishesController {
+  async create(request, response) {
+    const { name, category, description, ingredients } = request.body;
+    const user_id = request.user.id;
 
-    async create(request, response){
-        const {name, category, description, ingredients} = request.body;
-        const user_id = request.user.id
+    const dishesRepository = new DishesRepository();
+    const dishesService = new DishesService(dishesRepository);
 
-        const [dish_id] = await knex("dishes").insert({
-            name,
-            category,
-            description,
-            user_id
-        })
+    dishesService.insert({
+      name: name,
+      category: category,
+      description: description,
+      user_id: user_id,
+      ingredients: ingredients,
+    });
 
-        const ingredientsInsert = ingredients.map(name => {
-            return {
-                dish_id,
-                name,
-                user_id
-            }
-        })
-    
-        await knex("ingredients").insert(ingredientsInsert)
-        
-        return response.json()
-    }
-    async show(){}
-    async index(){}
-    async update(){}
-    async delete(){}
-
+    return response.json();
+  }
+  async show(request, response) {}
+  async index() {}
+  async update() {}
+  async delete() {}
 }
 
-module.exports = DishesController
+module.exports = DishesController;
