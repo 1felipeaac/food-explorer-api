@@ -14,10 +14,10 @@ class DishesRepository {
   }
 
   async createIngredient(ingredients, user_id, dish_id) {
-    const ingredientsInsert = ingredients.map((name) => {
+    const ingredientsInsert = ingredients.map((ingredient) => {
       return {
         dish_id,
-        name,
+        ingredient,
         user_id,
       };
     });
@@ -26,6 +26,10 @@ class DishesRepository {
 
     return ingredientsCreated;
   }
+
+//  async readDish(id){
+//    return id
+//  }
 }
 
 module.exports = DishesRepository;

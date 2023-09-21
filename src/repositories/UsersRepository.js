@@ -37,7 +37,7 @@ class UsersRepository {
             name = (?),
             email = (?),
             password = (?),
-            updated_at = DATETIME('now')
+            updated_at = DATETIME('now', 'localtime')
             WHERE id = (?)`,
       [name, email, password, id]
     );

@@ -12,6 +12,11 @@ class DishesService{
         return {dish, ingredientsCreated}
     }
 
+    // async readDishById(id){
+    //     const dish = await this.dishesService.readDishById(id)
+
+    //     return dish
+    // }
 }
 
 module.exports = DishesService

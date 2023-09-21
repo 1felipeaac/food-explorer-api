@@ -11,5 +11,7 @@ dishRoutes.use(ensureAuthenticated)
 dishRoutes.use(verifyUserAuthorization('admin'))
 
 dishRoutes.post("/", dishesController.create);
+dishRoutes.get("/:id", dishesController.show);
+dishRoutes.get("/", dishesController.index);
 
 module.exports = dishRoutes;
