@@ -133,7 +133,7 @@ class DishesRepository {
       return dish;
 
     }catch(error){
-      throw new AppError(error.message, 404)
+      throw new AppError(error.message, 400)
     }
   }
 
