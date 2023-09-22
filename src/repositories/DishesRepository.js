@@ -22,14 +22,73 @@ class DishesRepository {
       };
     });
 
-    const ingredientsCreated = await knex("ingredients").insert(ingredientsInsert);
+    const ingredientsCreated = await knex("ingredients").insert(
+      ingredientsInsert
+    );
 
     return ingredientsCreated;
   }
 
-//  async readDish(id){
-//    return id
-//  }
+  async findById(user_id){
+    const dishes = await knex("dishes").where({user_id})
+
+    // console.log(dishes)
+
+    return {dishes}
+  }
+
+  async findDishById(id) {
+    const dish = await knex("dishes").where({ id }).first();
+    const ingredients = await knex("ingredients")
+      .where({ dish_id: id })
+      .orderBy("ingredient");
+    const result = {
+      ...dish,
+      ingredients,
+    };
+
+    return result;
+  }
+
+  async joinIngredientsWithDish(name, filterIngredients, user_id) {
+    const join = await knex("ingredients")
+      .select(["dishes.id", "dishes.name", "dishes.user_id"])
+      .where("dishes.user_id", user_id)
+      .whereLike("dishes.name", `%${name}`)
+      .whereIn("ingredient", filterIngredients)
+      .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
+      .groupBy("dishes.id")
+      .orderBy("dishes.name");
+
+    return join;
+  }
+
+  async selectDish(name, user_id) {
+    const dish = await knex("dishes")
+      .select([
+        "dishes.id",
+        "dishes.name",
+        "dishes.user_id",
+        "dishes.description",
+      ])
+      .where({ user_id })
+      .whereLike("name", `%${name}`)
+      .orderBy("name");
+
+    return dish;
+  }
+
+  async findIngredientsByUser(user_id){
+    const ingredients = await knex("ingredients").where({user_id})
+
+    return ingredients
+  }
+
+  async remove(id){
+    const dish = await knex("dishes").where({id}).delete()
+
+    return dish
+  }
 }
 
 module.exports = DishesRepository;
