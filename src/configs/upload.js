@@ -11,7 +11,7 @@ const MULTER = {
         filename: (req, file, cb) => {
             const fileHash = crypto.randomBytes(10).toString("hex")
             const fileName = `${fileHash}-${file.originalname}`
-            cb(null, fileName);
+            return cb(null, fileName);
         }
     })
 }
