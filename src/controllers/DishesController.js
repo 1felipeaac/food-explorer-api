@@ -20,7 +20,6 @@ class DishesController {
 
     return response.json();
   }
-
   async show(request, response) {
     const { id } = request.params;
     const dishesRepository = new DishesRepository();
@@ -46,15 +45,32 @@ class DishesController {
 
     return response.json(dishWithIngredients);
   }
-  async update() {}
   async delete(request, response) {
     const {id} = request.params;
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
 
-    dishesService.deleteDish(id)
+    dishesService.deleteDish({id})
 
     return response.json()
+  }
+  async update(request, response) {
+    const dishesRepository = new DishesRepository();
+    const dishesService = new DishesService(dishesRepository);
+
+    const { id } = request.params;
+    const { name, category, description, ingredients } = request.body;
+    const user_id = request.user.id;
+
+    dishesService.updateDish(id, {name, category, description, ingredients, user_id})
+
+    return response.json({
+      id,
+      name,
+      category,
+      description,
+      ingredients
+    })
   }
 }
 

@@ -13,6 +13,7 @@ dishRoutes.use(verifyUserAuthorization('admin'))
 dishRoutes.post("/", dishesController.create);
 dishRoutes.get("/:id", dishesController.show);
 dishRoutes.delete("/:id", dishesController.delete);
+dishRoutes.put("/:id", dishesController.update);
 dishRoutes.get("/", dishesController.index);
 
 module.exports = dishRoutes;
