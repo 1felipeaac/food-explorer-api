@@ -4,7 +4,7 @@ const DishesService = require("../services/DishesService");
 
 class DishesController {
   async create(request, response) {
-    const { name, category, description, ingredients } = request.body;
+    const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
     const dishesRepository = new DishesRepository();
@@ -16,6 +16,7 @@ class DishesController {
       description: description,
       user_id: user_id,
       ingredients: ingredients,
+      value: value
     });
 
     return response.json();

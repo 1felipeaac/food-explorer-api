@@ -5,12 +5,13 @@ class DishesService {
     this.dishesService = dishesService;
   }
 
-  async insert({ name, category, description, user_id, ingredients }) {
+  async insert({ name, category, description, user_id, ingredients, value }) {
     const [dish] = await this.dishesService.create({
       name,
       category,
       description,
       user_id,
+      value
     });
     const ingredientsCreated = await this.dishesService.createIngredient(
       ingredients,

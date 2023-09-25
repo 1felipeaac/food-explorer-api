@@ -3,13 +3,14 @@ const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 
 class DishesRepository {
-  async create({ name, category, description, user_id }) {
+  async create({ name, category, description, user_id, value }) {
     try {
       const dish = await knex("dishes").insert({
         name,
         category,
         description,
         user_id,
+        value
       });
   
       return dish;
