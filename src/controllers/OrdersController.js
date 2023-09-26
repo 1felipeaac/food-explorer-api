@@ -1,36 +1,38 @@
 const AppError = require("../utils/AppError")
 const knex = require("../database/knex");
 
-class OrderControler{
-    async create(request, response){
-        const user_id = request.user.id
-      //   const {dishes} = request.query
-      //   const amount = request.body
-        
-      //   const filteredDishes = dishes.split(',').map(dish => Number(dish.trim()))
-      //   const result = await knex("dishes").whereIn("id", filteredDishes)
-        
-      //  for(let index = 0; index < result.length; index++){
-      //   const dish = result[index]
-      //   console.log(dish.name)
-      //  }
+class OrderController {
+  async create(request, response) {
+    const userId = request.user.id
 
-      //   return response.json(({user_id, result}))
-      const orders = request.body
+    const orders = request.body
 
-      const description = orders.map(order => [order.amount, order.name, (order.amount * order.value)])
-
-      const order = await knex("orders").insert({
-        description,
-        user_id
-      })
-
-      console.log(description)
-      return response.json(orders)
+    let total = [];
+    let userOrder = [];
+    
+    for (let order of orders) {
+      const results = await knex("dishes").whereIn("id", [order.id])
+      for (const result of results) {
+        total.push(order.amount * result.value)
+        userOrder.push(`${order.amount}x ${result.name} R$ ${result.value.toFixed(2)}`)
+      
+      }
+      
     }
-    show(request, response){}
-    index(request, response){}
-    delete(request, response){}
+    const detailOrder = JSON.stringify(userOrder)
+    const detailing = detailOrder.toString().slice(1, -1)
+    const order = await knex("orders").insert({
+      detailing: detailing,
+      user_id: userId
+    })
+    const sum = total.reduce((total, current) => total + current, 0);
+    console.log(order)
+
+    return response.json()
+  }
+  show(request, response) { }
+  index(request, response) { }
+  delete(request, response) { }
 }
 
-module.exports = OrderControler;
+module.exports = OrderController;
