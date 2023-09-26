@@ -37,14 +37,28 @@ class OrderController {
   }
   async delete(request, response) {
     const { id } = request.params;
+    const user_id = request.user.id
 
     const ordersRepository = new OrdersRepository()
     const ordersService = new OrdersService(ordersRepository)
 
-    await ordersService.remove(id)
+    await ordersService.remove(id, user_id)
     
-    return response.json()
+    return response.json(`Pedido ${id} excluído`)
    }
+   async update(request, response) {
+    const { id } = request.params;
+    const {status} = request.body
+
+    const ordersRepository = new OrdersRepository()
+    const ordersService = new OrdersService(ordersRepository)
+
+    await ordersService.update(id, status)
+
+
+    return response.json(`Status atualizado: ${status}`)
+
+  }
 }
 
 module.exports = OrderController;

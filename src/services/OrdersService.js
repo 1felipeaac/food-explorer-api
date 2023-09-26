@@ -51,8 +51,27 @@ class OrdersService{
         }
     }
 
-    async remove(id){
+    async remove(id, user_id){
+        const findOrder = await this.ordersService.findOrderById(id)
+        if(!findOrder || (findOrder.user_id !== user_id)) {
+            throw new AppError("Pedido não encontrado", 404)
+        }
         return await this.ordersService.deleteOrder(id)
+    }
+
+    async update(id, orderStatus){
+
+        const enumStatus = await this.ordersService.verifyStatus()
+        const verifyStatus = enumStatus.map(name => name.status)
+
+        if (!verifyStatus.includes(orderStatus)) {
+            throw new AppError("Status invalido", 400)
+          }
+
+        const updateStatus = await this.ordersService.updateStatusOrder(id, orderStatus)
+
+        return updateStatus
+            
     }
 }
 

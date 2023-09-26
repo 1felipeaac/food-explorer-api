@@ -67,6 +67,23 @@ class OrdersRepository{
             throw new AppError(error.message);
         }
     }
+
+    async verifyStatus(){
+        const enumStatus = await knex("orders").distinct("status")
+
+        return enumStatus;
+    }
+
+    async updateStatusOrder(id, status){
+
+        try {
+            const statusOrder = await knex("orders").where({id}).update({status: status})
+            return statusOrder;
+
+        } catch (error) {
+            throw new AppError(error.message);
+        }
+    }
 }
 
 module.exports = OrdersRepository;
