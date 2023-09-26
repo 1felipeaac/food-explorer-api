@@ -3,11 +3,10 @@ exports.up = knex =>
     table.increments("id");
     table.text("status").notNullable().defaultTo("em preparo");
     table.text("detailing").notNullable();
-
-    table.integer("dish_id").references("id").inTable("dishes").onDelete("CASCADE");
+    table.decimal("bill", 10, 2).notNullable()
     table.integer("user_id").references("id").inTable("users")
 
     table.timestamp("created_at").default(knex.fn.now());
   });
 
-exports.down = knex => knex.schema.dropTable("users");
+exports.down = knex => knex.schema.dropTable("orders");

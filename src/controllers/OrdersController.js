@@ -1,38 +1,50 @@
 const AppError = require("../utils/AppError")
 const knex = require("../database/knex");
+const OrdersRepository = require("../repositories/OrdersRepository")
+const OrdersService = require("../services/OrdersService")
 
 class OrderController {
   async create(request, response) {
     const userId = request.user.id
-
     const orders = request.body
 
-    let total = [];
-    let userOrder = [];
-    
-    for (let order of orders) {
-      const results = await knex("dishes").whereIn("id", [order.id])
-      for (const result of results) {
-        total.push(order.amount * result.value)
-        userOrder.push(`${order.amount}x ${result.name} R$ ${result.value.toFixed(2)}`)
-      
-      }
-      
-    }
-    const detailOrder = JSON.stringify(userOrder)
-    const detailing = detailOrder.toString().slice(1, -1)
-    const order = await knex("orders").insert({
-      detailing: detailing,
-      user_id: userId
-    })
-    const sum = total.reduce((total, current) => total + current, 0);
-    console.log(order)
+    const ordersRepository = new OrdersRepository()
+    const ordersService = new OrdersService(ordersRepository)
+
+    await ordersService.insert(userId, orders)
 
     return response.json()
   }
-  show(request, response) { }
-  index(request, response) { }
-  delete(request, response) { }
+  async show(request, response) {
+    const { id } = request.params;
+    const {id: user_id, role} = request.user
+
+    const ordersRepository = new OrdersRepository()
+    const ordersService = new OrdersService(ordersRepository)
+
+    const orders = await ordersService.listbyId(id, role, user_id)
+
+    return response.json({orders})
+   }
+  async index(request, response) { 
+    const {id: user_id, role} = request.user
+
+    const ordersRepository = new OrdersRepository()
+    const ordersService = new OrdersService(ordersRepository)
+
+    const orders = await ordersService.listAllOrders(user_id, role)
+    return response.json(orders)
+  }
+  async delete(request, response) {
+    const { id } = request.params;
+
+    const ordersRepository = new OrdersRepository()
+    const ordersService = new OrdersService(ordersRepository)
+
+    await ordersService.remove(id)
+    
+    return response.json()
+   }
 }
 
 module.exports = OrderController;

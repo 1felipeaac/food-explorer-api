@@ -1,4 +1,3 @@
-const sqliteConnection = require("../database/sqlite");
 const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 
