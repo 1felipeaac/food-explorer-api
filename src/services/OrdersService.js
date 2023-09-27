@@ -28,6 +28,10 @@ class OrdersService{
 
     async listbyId(id, role, user_id){
         const findOrder = await this.ordersService.findOrderById(id);
+        
+        if(!findOrder) {
+            throw new AppError("Pedido não encontrado", 404)
+        }
 
         if(role === 'admin') {
             return findOrder

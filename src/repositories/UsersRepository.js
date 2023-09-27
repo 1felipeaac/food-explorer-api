@@ -29,7 +29,6 @@ class UsersRepository {
   }
 
   async update(name, email, password, id) {
-    // console.log("cheguei no update do UserRepositories.js");
     const database = await sqliteConnection();
     const user_id = await database.run(
       `

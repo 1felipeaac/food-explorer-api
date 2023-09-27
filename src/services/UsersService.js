@@ -25,7 +25,7 @@ class UsersService {
     return userCreated;
   }
 
-  async alter(user_id, { name, email, password, old_password }) {
+  async alter(user_id,  {name, email, password, old_password} ) {
     const user = await this.userRepository.findByUser(user_id);
 
     if (!user) {
