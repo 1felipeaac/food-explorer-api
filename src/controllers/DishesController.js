@@ -16,7 +16,7 @@ class DishesController {
       description: description,
       user_id: user_id,
       ingredients: ingredients,
-      value: value
+      value: value,
     });
 
     return response.json();
@@ -45,31 +45,39 @@ class DishesController {
     return response.json(dishWithIngredients);
   }
   async delete(request, response) {
-    const {id} = request.params;
+    const { id } = request.params;
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
 
-    dishesService.deleteDish({id})
+    await dishesService.deleteDish(id);
 
-    return response.json()
+    return response.json();
   }
   async update(request, response) {
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
 
     const { id } = request.params;
-    const { name, category, description, ingredients } = request.body;
+    const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
-    dishesService.updateDish(id, {name, category, description, ingredients, user_id})
+    await dishesService.updateDish(id, {
+      name,
+      category,
+      description,
+      value,
+      ingredients,
+      user_id,
+    });
 
     return response.json({
       id,
       name,
       category,
       description,
-      ingredients
-    })
+      value,
+      ingredients,
+    });
   }
 }
 

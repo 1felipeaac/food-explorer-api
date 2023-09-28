@@ -1,89 +1,58 @@
 const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 
-class OrdersRepository{
-    async listOrdersById(id){
-        try {
-            const results = await knex("dishes").whereIn("id", [id])
+class OrdersRepository {
+  async listOrdersById(id) {
+    const results = await knex("dishes").whereIn("id", [id]);
 
-            return results;
-        } catch (error) {
-            throw new AppError(error.message);
-        }
-    }
+    return results;
+  }
 
-    async createOrder(detailing, userId, sum){
+  async createOrder(detailing, userId, sum) {
+    const order = await knex("orders").insert({
+      detailing: detailing,
+      user_id: userId,
+      bill: sum,
+    });
+    return order;
+  }
 
-        try {
-            const order = await knex("orders").insert({
-                detailing: detailing,
-                user_id: userId,
-                bill: sum
-              })
-            return order;
-            
-        } catch (error) {
-            throw new AppError(error.message);
-        }
-    }
+  async findOrderById(id) {
+    const order = await knex("orders").where({ id }).first();
+    return order;
+  }
 
-    async findOrderById(id){
-        try {
-            const order = await knex("orders").where({ id }).first();
-            return order;
-            
-        } catch (error) {
-            throw new AppError(error.message);
-        }
-    }
+  async selectedOrder() {
+    const order = await knex.select("*").from("orders");
 
-    async selectedOrder(){
-        try {
-            const order = await knex.select("*").from("orders")
+    return order;
+  }
 
-            return order;
-            
-        } catch (error) {
-            throw new AppError(error.message);
-        }
-    }
+  async selectedOrderByUserId(id) {
+    const selectOrdersByUserId = await knex
+      .select("*")
+      .from("orders")
+      .where({ user_id: id });
+    return selectOrdersByUserId;
+  }
 
-    async selectedOrderByUserId(id){
-        try {
-            const selectOrdersByUserId = await knex.select("*").from("orders").where({user_id: id})
-            return selectOrdersByUserId;
-            
-        } catch (error) {
-            throw new AppError(error.message)
-        }
-    }
+  async deleteOrder(id) {
+    const deleted = await knex("orders").where({ id }).del();
+    return deleted;
+  }
 
-    async deleteOrder(id){
-        try {
-            const deleted = await knex("orders").where({ id }).del();
-            return deleted;
-            
-        } catch (error) {
-            throw new AppError(error.message);
-        }
-    }
+  async verifyStatus() {
+    const enumStatus = await knex("orders").distinct("status");
 
-    async verifyStatus(){
-        const enumStatus = await knex("orders").distinct("status")
+    return enumStatus;
+  }
 
-        return enumStatus;
-    }
-
-    async updateStatusOrder(id, status){
-
-        try {
-            const statusOrder = await knex("orders").where({id}).update({status: status})
-            return statusOrder;
-
-        } catch (error) {
-            throw new AppError(error.message);
-        }
-    }
+  async updateStatusOrder(id, status) {
+    const statusOrder = await knex("orders")
+      .where({ id })
+      .update({ status: status });
+    return statusOrder;
+  }
 }
 
 module.exports = OrdersRepository;

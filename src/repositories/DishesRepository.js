@@ -3,198 +3,141 @@ const AppError = require("../utils/AppError");
 
 class DishesRepository {
   async createDish({ name, category, description, user_id, value }) {
-    try {
-      const dish = await knex("dishes").insert({
-        name,
-        category,
-        description,
-        user_id,
-        value
-      });
-  
-      return dish;
-      
-    } catch (error) {
-      throw new AppError(error.message, 400)
-    }
+    const dish = await knex("dishes").insert({
+      name,
+      category,
+      description,
+      user_id,
+      value,
+    });
+
+    return dish;
   }
 
   async createIngredient(ingredients, user_id, dish_id) {
+    const ingredientsInsert = ingredients.map((ingredient) => {
+      return {
+        dish_id,
+        ingredient,
+        user_id,
+      };
+    });
 
-    try {
-      const ingredientsInsert = ingredients.map((ingredient) => {
-        return {
-          dish_id,
-          ingredient,
-          user_id,
-        };
-      });
-  
-      const ingredientsCreated = await knex("ingredients").insert(
-        ingredientsInsert
-      );
-  
-      return ingredientsCreated;
-      
-    } catch (error) {
-      throw new AppError(error.message, 400)
-    }
+    const ingredientsCreated = await knex("ingredients").insert(
+      ingredientsInsert
+    );
+
+    return ingredientsCreated;
   }
 
-  async listById(){
-
-    try {
-      const dishes = await knex("dishes")
-      .select(["dishes.image",
+  async listById() {
+    const dishes = await knex("dishes").select([
+      "dishes.image",
       "dishes.id",
-      "dishes.name", 
-      "dishes.category", 
-      "dishes.description", 
+      "dishes.name",
+      "dishes.category",
+      "dishes.description",
       "dishes.value",
-    ])
-  
-      return {dishes}
-      
-    } catch (error) {
-      throw new AppError(error.message, 404)
-    }
+    ]);
+
+    return { dishes };
   }
 
   async dishFoundById(id) {
-    try {
-      const dish = await knex("dishes")
+    const dish = await knex("dishes")
       .select([
         "dishes.image",
-        "dishes.name", 
-        "dishes.category", 
-        "dishes.description", 
-        "dishes.value"
+        "dishes.name",
+        "dishes.category",
+        "dishes.description",
+        "dishes.value",
       ])
-      .where({ id }).first();
-      
-      const ingredients = await knex("ingredients")
+      .where({ id })
+      .first();
+
+    const ingredients = await knex("ingredients")
       .select(["ingredient"])
-        .where({ dish_id: id })
-        .orderBy("ingredient");
+      .where({ dish_id: id })
+      .orderBy("ingredient");
 
-      const result = {
-        ...{dish},
-        ingredients,
-      };
-  
-      return result;
+    const result = {
+      ...{ dish },
+      ingredients,
+    };
 
-    }catch(error){
-      throw new AppError(error.message, 404)
-    }
+    return result;
   }
 
   async linkDishesIngredients(name, filterIngredients) {
-    try {
-      const caseInsensitive = filterIngredients.map(ingredient => ingredient.toLowerCase())
-  
-      const join = await knex("ingredients")
-        .select([
-          "dishes.id", 
-          "dishes.name", 
-          "dishes.user_id"
-        ])
-        .whereLike("dishes.name", `%${name}%`)
-        .whereIn(knex.raw("LOWER(ingredient)"), caseInsensitive)
-        .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
-        .groupBy("dishes.id")
-        .orderBy("dishes.name");
-  
-      return join;
+    const caseInsensitive = filterIngredients.map((ingredient) =>
+      ingredient.toLowerCase()
+    );
 
-    }catch(error){
-      throw new AppError(error.message, 400)
-    }
+    const join = await knex("ingredients")
+      .select(["dishes.id", "dishes.name", "dishes.user_id"])
+      .whereLike("dishes.name", `%${name}%`)
+      .whereIn(knex.raw("LOWER(ingredient)"), caseInsensitive)
+      .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
+      .groupBy("dishes.id")
+      .orderBy("dishes.name");
+
+    return join;
   }
 
   async listByIngredients(filterIngredients) {
-    try {
-      const caseInsensitive = filterIngredients.map(ingredient => ingredient.toLowerCase())
+    const caseInsensitive = filterIngredients.map((ingredient) =>
+      ingredient.toLowerCase()
+    );
 
-      const dishes = await knex("ingredients")
+    const dishes = await knex("ingredients")
       .select(["ingredients.dish_id"])
-      .whereLike("ingredient", `%${caseInsensitive}%`)
-      const dishesFound = dishes.map( dish => this.findDishById(dish.dish_id))
-      
-      const dishSelected = await Promise.all(dishesFound)
-  
-      return dishSelected;
+      .whereLike("ingredient", `%${caseInsensitive}%`);
+    const dishesFound = dishes.map((dish) => this.dishFoundById(dish.dish_id));
 
-    }catch(error){
-      throw new AppError(error.message, 400)
-    }
+    const dishSelected = await Promise.all(dishesFound);
+    console.log(dishSelected);
+
+    return dishSelected;
   }
 
   async selectDish(name) {
-    try {
-      const dish = await knex("dishes")
-        .select([
-          "dishes.id",
-          "dishes.name",
-          "dishes.description",
-        ])
-        .whereLike("name", `%${name}%`)
-        .orderBy("name");
-  
-      return dish;
+    const dish = await knex("dishes")
+      .select(["dishes.id", "dishes.name", "dishes.description", "dishes.value"])
+      .whereLike("name", `%${name}%`)
+      .orderBy("name");
 
-    }catch(error){
-      throw new AppError(error.message, 400)
-    }
+    return dish;
   }
 
-  async allIngredients(){
-    try {
-      const ingredients = await knex("ingredients")
-      .select("*")
-      return ingredients
-      
-    } catch (error) {
-      throw new AppError(error.message, 404)
-      
-    }
+  async allIngredients() {
+    const ingredients = await knex("ingredients").select("*");
+    return ingredients;
   }
 
   async findDishById(id) {
-    const dish = await knex("dishes")
-     .select("*")
-     .where({ id }).first();
-      
+    const dish = await knex("dishes").select("*").where({ id }).first();
+
     return dish;
-   
   }
 
-  async remove(id){
-    return await knex("dishes").where({id}).delete()
+  async remove(id) {
+    const del = await knex("dishes").where({ id }).delete();
 
-    
+    return del;
   }
 
-  async renewDish(id, name,description, category, user_id){
-    try {
-       return await knex("dishes").where({id}).update({
-        name: name,
-        category: category,
-        description: description,
-        user_id: user_id
-      })
-      
-    } catch (error) {
-      throw new AppError(error.message, 400)
-    }
+  async renewDish(id, name, category, description, value, user_id) {
+    return await knex("dishes").where({ id }).update({
+      name: name,
+      category: category,
+      description: description,
+      value: value,
+      user_id: user_id,
+    });
   }
 
-  async removeIngredients({id}){
-    try {
-      return await knex("ingredients").where({dish_id: id}).delete()
-    } catch (error) {
-      throw new AppError(error.message, 400)
-    }
+  async removeIngredients({ id }) {
+    return await knex("ingredients").where({ dish_id: id }).delete();
   }
 }
 
