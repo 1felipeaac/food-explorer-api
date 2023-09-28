@@ -60,7 +60,7 @@ class DishesRepository {
     }
   }
 
-  async findDishById(id) {
+  async dishFoundById(id) {
     try {
       const dish = await knex("dishes")
       .select([
@@ -160,17 +160,19 @@ class DishesRepository {
     }
   }
 
-  async remove(id){
+  async findDishById(id) {
+    const dish = await knex("dishes")
+     .select("*")
+     .where({ id }).first();
+      
+    return dish;
+   
+  }
 
-    try {
-      const dish = await knex("dishes").where({id}).delete()
-  
-      return dish
-      
-    } catch (error) {
-      throw new AppError(error.message, 400)
-      
-    }
+  async remove(id){
+    return await knex("dishes").where({id}).delete()
+
+    
   }
 
   async renewDish(id, name,description, category, user_id){

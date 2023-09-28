@@ -23,7 +23,7 @@ class DishesService {
   }
 
   async listDishById(id) {
-    const {dish, ingredients} = await this.dishesService.findDishById(id);
+    const {dish, ingredients} = await this.dishesService.dishFoundById(id);
 
     const ingredientsMap = ingredients.map(ingredient => ingredient.ingredient)
 
@@ -102,10 +102,14 @@ class DishesService {
 
   async deleteDish(id){
 
-    const remove = await this.dishesService.remove(id)
+      const dish = await this.dishesService.findDishById(id)
 
-    return remove
-
+      if(dish){
+        await this.dishesService.remove(id)
+      }else{
+        return `O prato ${id} não existe`
+      }
+      
   }
 
   async updateDish(id, {name, category, description, user_id, ingredients}){
