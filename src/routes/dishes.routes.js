@@ -11,12 +11,11 @@ const upload = multer(uploadConfig.MULTER)
 const dishesController = new DishesController();
 
 dishRoutes.use(ensureAuthenticated)
-dishRoutes.use(verifyUserAuthorization('admin'))
 
-dishRoutes.post("/", dishesController.create);
+dishRoutes.post("/", verifyUserAuthorization('admin'),dishesController.create);
 dishRoutes.get("/:id", dishesController.show);
-dishRoutes.delete("/:id", dishesController.delete);
-dishRoutes.put("/:id", dishesController.update);
+dishRoutes.delete("/:id", verifyUserAuthorization('admin'),dishesController.delete);
+dishRoutes.put("/:id", verifyUserAuthorization('admin'),dishesController.update);
 dishRoutes.get("/", dishesController.index);
 dishRoutes.patch("/image", upload.single("image"), (request, response) => {
     console.log(request.file.filename)

@@ -2,7 +2,7 @@ const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 
 class DishesRepository {
-  async create({ name, category, description, user_id, value }) {
+  async createDish({ name, category, description, user_id, value }) {
     try {
       const dish = await knex("dishes").insert({
         name,
@@ -41,10 +41,17 @@ class DishesRepository {
     }
   }
 
-  async listById(user_id){
+  async listById(){
 
     try {
-      const dishes = await knex("dishes").where({user_id})
+      const dishes = await knex("dishes")
+      .select(["dishes.image",
+      "dishes.id",
+      "dishes.name", 
+      "dishes.category", 
+      "dishes.description", 
+      "dishes.value",
+    ])
   
       return {dishes}
       
@@ -55,12 +62,23 @@ class DishesRepository {
 
   async findDishById(id) {
     try {
-      const dish = await knex("dishes").where({ id }).first();
+      const dish = await knex("dishes")
+      .select([
+        "dishes.image",
+        "dishes.name", 
+        "dishes.category", 
+        "dishes.description", 
+        "dishes.value"
+      ])
+      .where({ id }).first();
+      
       const ingredients = await knex("ingredients")
+      .select(["ingredient"])
         .where({ dish_id: id })
         .orderBy("ingredient");
+
       const result = {
-        ...dish,
+        ...{dish},
         ingredients,
       };
   
@@ -71,7 +89,7 @@ class DishesRepository {
     }
   }
 
-  async joinIngredientsWithDish(name, filterIngredients, user_id) {
+  async linkDishesIngredients(name, filterIngredients) {
     try {
       const caseInsensitive = filterIngredients.map(ingredient => ingredient.toLowerCase())
   
@@ -81,8 +99,7 @@ class DishesRepository {
           "dishes.name", 
           "dishes.user_id"
         ])
-        .where("dishes.user_id", user_id)
-        .whereLike("dishes.name", `%${name}`)
+        .whereLike("dishes.name", `%${name}%`)
         .whereIn(knex.raw("LOWER(ingredient)"), caseInsensitive)
         .innerJoin("dishes", "dishes.id", "ingredients.dish_id")
         .groupBy("dishes.id")
@@ -95,39 +112,33 @@ class DishesRepository {
     }
   }
 
-  async listByIngredients(filterIngredients, user_id) {
+  async listByIngredients(filterIngredients) {
     try {
       const caseInsensitive = filterIngredients.map(ingredient => ingredient.toLowerCase())
-      const join = await knex("dishes")
-        .select([
-          "dishes.id", 
-          "dishes.name",
-          "dishes.description",
-        ])
-        .where("ingredients.user_id", user_id)
-        .whereIn(knex.raw("LOWER(ingredient)"), caseInsensitive)
-        .innerJoin("ingredients", "dishes.id", "ingredients.dish_id")
-        .groupBy("dishes.id")
-        .orderBy("dishes.name");
+
+      const dishes = await knex("ingredients")
+      .select(["ingredients.dish_id"])
+      .whereLike("ingredient", `%${caseInsensitive}%`)
+      const dishesFound = dishes.map( dish => this.findDishById(dish.dish_id))
+      
+      const dishSelected = await Promise.all(dishesFound)
   
-      return join;
+      return dishSelected;
 
     }catch(error){
       throw new AppError(error.message, 400)
     }
   }
 
-  async selectDish(name, user_id) {
+  async selectDish(name) {
     try {
       const dish = await knex("dishes")
         .select([
           "dishes.id",
           "dishes.name",
-          // "dishes.user_id",
           "dishes.description",
         ])
-        .where({ user_id })
-        .whereLike("name", `%${name}`)
+        .whereLike("name", `%${name}%`)
         .orderBy("name");
   
       return dish;
@@ -137,10 +148,10 @@ class DishesRepository {
     }
   }
 
-  async findIngredientsByUser(user_id){
+  async allIngredients(){
     try {
-      const ingredients = await knex("ingredients").where({user_id})
-  
+      const ingredients = await knex("ingredients")
+      .select("*")
       return ingredients
       
     } catch (error) {

@@ -27,9 +27,9 @@ class DishesController {
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
 
-    const findDish = await dishesService.readDishById(id);
+    const presentation = await dishesService.listDishById(id);
 
-    return response.json({ findDish });
+    return response.json({ presentation });
   }
   async index(request, response) {
     const dishesRepository = new DishesRepository();
@@ -37,12 +37,9 @@ class DishesController {
 
     const { name, ingredients } = request.query;
 
-    const user_id = request.user.id;
-
-    const dishWithIngredients = await dishesService.listDishByIngredients(
-      ingredients,
+    const dishWithIngredients = await dishesService.listDishes(
       name,
-      user_id
+      ingredients
     );
 
     return response.json(dishWithIngredients);

@@ -6,7 +6,7 @@ class DishesService {
   }
 
   async insert({ name, category, description, user_id, ingredients, value }) {
-    const [dish] = await this.dishesService.create({
+    const [dish] = await this.dishesService.createDish({
       name,
       category,
       description,
@@ -22,41 +22,55 @@ class DishesService {
     return { dish, ingredientsCreated };
   }
 
-  async readDishById(id) {
-    const dish = await this.dishesService.findDishById(id);
+  async listDishById(id) {
+    const {dish, ingredients} = await this.dishesService.findDishById(id);
 
-    return dish;
+    const ingredientsMap = ingredients.map(ingredient => ingredient.ingredient)
+
+    return {dish, ingredients: ingredientsMap};
   }
 
-  async listDishByIngredients(ingredients, name, user_id) {
+  async listDishes(name, ingredients) {
     let dishes;
 
     if(!name && !ingredients){
-        dishes = await this.dishesService.listById(user_id)
+        dishes = await this.dishesService.listById()
 
-        return dishes
+      return dishes
     }
 
     if(!name){
       const filterIngredients = ingredients
       .split(",")
       .map((ingredient) => ingredient.trim());
-      try {
-        dishes = await this.dishesService.listByIngredients(filterIngredients, user_id)
-        
-      } catch (error) {
-        console.log(error.message)
-      }
 
-      return dishes
+        const dishesByIngredients = await this.dishesService.listByIngredients(filterIngredients)
+
+        if(dishesByIngredients.length === 0){
+          throw new AppError(`Não existe prato com ingrediente ${filterIngredients}, ou o ingrediente está digitado de forma incorreta`, 404)
+        }
+
+        const dishes = dishesByIngredients.map(dish =>{
+          const dishFound = dish.dish
+          const listIngredientsFound = dish.ingredients
+
+          const ingredientsMap = listIngredientsFound.map(ingredient => ingredient.ingredient)
+
+          return {
+            dish: dishFound,
+            ingredients: ingredientsMap
+          }
+
+        })
+
+        return dishes
     }
-
 
     if (ingredients) {
       const filterIngredients = ingredients
         .split(",")
         .map((ingredient) => ingredient.trim());
-        dishes = await this.dishesService.joinIngredientsWithDish(name, filterIngredients, user_id)
+        dishes = await this.dishesService.linkDishesIngredients(name, filterIngredients)
 
         const [dishId] = dishes.map(dish => dish.id)
 
@@ -65,21 +79,23 @@ class DishesService {
         }
 
     }else{
-        dishes = await this.dishesService.selectDish(name, user_id);
+        dishes = await this.dishesService.selectDish(name);
     }
-   
-    const userIngredients = await this.dishesService.findIngredientsByUser(user_id)
-    const dishWithIngredients = dishes.map(dish =>{
-        const dishIngredients = userIngredients
-            .filter(
-                ingredient => ingredient.dish_id === dish.id
-                )
 
-        return {
+    const ingredientsSelected = await this.dishesService.allIngredients()
+
+    const dishWithIngredients = dishes.map(dish => {
+        const dishIngredients = ingredientsSelected
+          .flatMap(
+            ingredient => (ingredient.dish_id === dish.id) ? 
+            ingredient.ingredient : []
+          );
+        
+          return {
             ...dish,
             ingredients: dishIngredients
-        }
-    })
+          };
+    });
 
     return dishWithIngredients;    
   }
