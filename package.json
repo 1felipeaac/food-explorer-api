@@ -7,7 +7,8 @@
     "test": "jest --watch",
     "start": "node ./src/server.js",
     "dev": "nodemon ./src/server.js",
-    "migrate": "knex migrate:latest"
+    "migrate": "knex migrate:latest",
+    "swagger-autogen": "node swagger.js"
   },
   "keywords": [],
   "author": "Felipe Coelho",
@@ -20,7 +21,11 @@
     "knex": "^2.5.1",
     "multer": "^1.4.5-lts.1",
     "sqlite": "^5.0.1",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.6",
+    "swagger-autogen": "^2.23.6",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-dist": "^5.9.0",
+    "swagger-ui-express": "^4.6.3"
   },
   "devDependencies": {
     "jest": "^29.7.0",
