@@ -1,20 +1,20 @@
 require("express-async-errors")
+
+const migrationsRun = require("./database/sqlite/migrations")
 const AppError = require("./utils/AppError");
+
 const express = require("express");
 const routes = require("./routes");
-const database = require("./database/sqlite")
 
-const swaggerUi = require('swagger-ui-express')
-const swaggerFile = require('../swagger_output.json')
+const cors = require('cors')
+
+migrationsRun()
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 app.use(routes);
-
-app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile))
-
-database();
 
 app.use((error, request, response, next) =>{
     if(error instanceof AppError){
