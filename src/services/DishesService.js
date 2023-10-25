@@ -56,6 +56,7 @@ class DishesService {
         dishes = await this.dishesService.listById();
 
         return dishes;
+        // throw new AppError("Sem parametros para busca")
       }
 
       if (!name) {
@@ -113,7 +114,7 @@ class DishesService {
         // console.log("Objeto"+ Object.keys(dishes).length);
 
         if(Object.keys(dishes).length === 0) {
-          throw new AppError(`Não foi encontrado prato com a busca ${name}`)
+          throw new AppError(`Sem resultados para busca: ${name}`)
         }
       }
 
