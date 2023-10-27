@@ -29,7 +29,7 @@ class DishesController {
 
     const presentation = await dishesService.listDishById(id);
 
-    return response.json({ presentation });
+    return response.json(presentation);
   }
   async index(request, response) {
     const dishesRepository = new DishesRepository();
