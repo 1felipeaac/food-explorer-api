@@ -22,6 +22,7 @@ class DishesService {
 
       return { dish, ingredientsCreated };
     } catch (error) {
+      // console.log(error.message)
       throw new AppError(error.message);
     }
   }
@@ -49,11 +50,13 @@ class DishesService {
 
   async listDishes(name, ingredients) {
     let dishes;
+    // console.log(name, ingredients);
     try {
       if (!name && !ingredients) {
         dishes = await this.dishesService.listById();
 
         return dishes;
+        // throw new AppError("Sem parametros para busca")
       }
 
       if (!name) {
@@ -108,6 +111,11 @@ class DishesService {
         }
       } else {
         dishes = await this.dishesService.selectDish(name);
+        // console.log("Objeto"+ Object.keys(dishes).length);
+
+        if(Object.keys(dishes).length === 0) {
+          throw new AppError(`Sem resultados para busca: ${name}`)
+        }
       }
 
       const ingredientsSelected = await this.dishesService.allIngredients();
@@ -143,7 +151,10 @@ class DishesService {
     }
   }
 
-  async updateDish(id, { name, category, description, value, user_id, ingredients }) {
+  async updateDish(
+    id,
+    { name, category, description, value, user_id, ingredients }
+  ) {
     const dish = await this.dishesService.findDishById(id);
     try {
       if (dish === undefined) {
