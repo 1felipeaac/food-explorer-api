@@ -2,8 +2,9 @@ const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 
 class DishesRepository {
-  async createDish({ name, category, description, user_id, value }) {
+  async createDish({ name, category, description, user_id, value, image }) {
     const dish = await knex("dishes").insert({
+      image,
       name,
       category,
       description,

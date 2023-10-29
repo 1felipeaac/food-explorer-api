@@ -5,9 +5,10 @@ class DishesService {
     this.dishesService = dishesService;
   }
 
-  async insert({ name, category, description, user_id, ingredients, value }) {
+  async insert({ name, category, description, user_id, ingredients, value, image }) {
     try {
       const [dish] = await this.dishesService.createDish({
+        image,
         name,
         category,
         description,
@@ -42,7 +43,7 @@ class DishesService {
         (ingredient) => ingredient.ingredient
       );
 
-      return { dish, ingredients: ingredientsMap };
+      return { id, dish, ingredients: ingredientsMap };
     } catch (error) {
       throw new AppError(error.message);
     }

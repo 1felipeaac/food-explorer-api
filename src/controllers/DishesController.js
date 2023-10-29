@@ -1,21 +1,33 @@
 const knex = require("../database/knex");
 const DishesRepository = require("../repositories/DishesRepository");
 const DishesService = require("../services/DishesService");
+const DiskStorage = require("../providers/DiskStorage");
 
 class DishesController {
   async create(request, response) {
     const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
+    const dataBody = request.body
+    const dataImage = request.files
+    const dishFilename = dataImage.image[0].filename
+
+    const diskStorage = new DiskStorage();
+    
+    let arrayIngredients = dataBody.ingredients.split(',');
+
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
 
+    const filename = await diskStorage.saveFile(dishFilename);
+
     await dishesService.insert({
+      image: filename,
       name: name,
       category: category,
       description: description,
       user_id: user_id,
-      ingredients: ingredients,
+      ingredients: arrayIngredients,
       value: value,
     });
 
@@ -29,7 +41,7 @@ class DishesController {
 
     const presentation = await dishesService.listDishById(id);
 
-    return response.json(presentation );
+    return response.json( presentation );
   }
   async index(request, response) {
     const dishesRepository = new DishesRepository();
