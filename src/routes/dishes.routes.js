@@ -16,16 +16,7 @@ dishRoutes.use(ensureAuthenticated);
 dishRoutes.post(
   "/",
   verifyUserAuthorization("admin"),
-  upload.fields(
-    [
-        {name: "image",maxCount: 1},
-        {name: "text",maxCount: 1},
-        {name: "text",maxCount: 1},
-        {name: "number",maxCount: 1},
-        {name: "text",maxCount: 1},
-        {name: "text",maxCount: 10},
-    ]
-  ),
+  upload.single('image'),
   dishesController.create
 );
 

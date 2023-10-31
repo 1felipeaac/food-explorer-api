@@ -5,38 +5,27 @@ const DiskStorage = require("../providers/DiskStorage");
 
 class DishesController {
   async create(request, response) {
-    // const { name, category, description, ingredients, value } = request.body;
+    const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
-    const body = request.body
-
-    const dataImage = request.files
-    const dishFilename = dataImage.image[0].filename
+    const {filename} = request.file
 
     const diskStorage = new DiskStorage();
     
-    let arrayIngredients = body.ingredients.split(',');
+    let arrayIngredients = ingredients.split(',');
 
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
-
-    try{
-      const filename = await diskStorage.saveFile(dishFilename);
-
-    }catch(error){
-      console.log(error)
-    }
-
-    console.log(dataBody,dishFilename);
+    const imageName = await diskStorage.saveFile(filename);
 
     await dishesService.insert({
-      image: filename,
-      name: body.name,
-      category: body.category,
-      description: body.description,
+      image: imageName,
+      name: name,
+      category: category,
+      description: description,
       user_id: user_id,
       ingredients: arrayIngredients,
-      value: body.value,
+      value: value,
     });
 
     return response.json();
