@@ -11,8 +11,6 @@ class DishesController {
     const {filename} = request.file
 
     const diskStorage = new DiskStorage();
-    
-    let arrayIngredients = ingredients.split(',');
 
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
@@ -24,7 +22,7 @@ class DishesController {
       category: category,
       description: description,
       user_id: user_id,
-      ingredients: arrayIngredients,
+      ingredients: ingredients,
       value: value,
     });
 
@@ -65,12 +63,19 @@ class DishesController {
   async update(request, response) {
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
-
+    
+    
     const { id } = request.params;
     const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
+    const {filename} = request.file
+    
+    const diskStorage = new DiskStorage();
+    const imageName = await diskStorage.saveFile(filename);
+
 
     await dishesService.updateDish(id, {
+      imageName,
       name,
       category,
       description,

@@ -1,12 +1,24 @@
 const AppError = require("../utils/AppError");
+const DiskStorage = require("../providers/DiskStorage");
+
 
 class DishesService {
   constructor(dishesService) {
     this.dishesService = dishesService;
   }
 
-  async insert({ name, category, description, user_id, ingredients, value, image }) {
+  async insert({
+    name,
+    category,
+    description,
+    user_id,
+    ingredients,
+    value,
+    image,
+  }) {
     try {
+      let arrayIngredients = ingredients.split(",");
+
       const [dish] = await this.dishesService.createDish({
         image,
         name,
@@ -16,7 +28,7 @@ class DishesService {
         value,
       });
       const ingredientsCreated = await this.dishesService.createIngredient(
-        ingredients,
+        arrayIngredients,
         user_id,
         dish
       );
@@ -114,8 +126,8 @@ class DishesService {
         dishes = await this.dishesService.selectDish(name);
         // console.log("Objeto"+ Object.keys(dishes).length);
 
-        if(Object.keys(dishes).length === 0) {
-          throw new AppError(`Sem resultados para busca: ${name}`)
+        if (Object.keys(dishes).length === 0) {
+          throw new AppError(`Sem resultados para busca: ${name}`);
         }
       }
 
@@ -154,15 +166,17 @@ class DishesService {
 
   async updateDish(
     id,
-    { name, category, description, value, user_id, ingredients }
+    { image, name, category, description, value, user_id, ingredients }
   ) {
     const dish = await this.dishesService.findDishById(id);
     try {
+      
       if (dish === undefined) {
         throw new AppError(`O prato ${id} não existe`, 404);
       }
       const updateDish = await this.dishesService.renewDish(
         id,
+        image,
         name,
         category,
         description,

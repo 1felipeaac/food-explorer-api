@@ -127,8 +127,9 @@ class DishesRepository {
     return del;
   }
 
-  async renewDish(id, name, category, description, value, user_id) {
+  async renewDish(id, image, name, category, description, value, user_id) {
     return await knex("dishes").where({ id }).update({
+      image,image,
       name: name,
       category: category,
       description: description,
