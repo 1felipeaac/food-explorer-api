@@ -169,11 +169,19 @@ class DishesService {
     { image, name, category, description, value, user_id, ingredients }
   ) {
     const dish = await this.dishesService.findDishById(id);
+    const diskStorage = new DiskStorage();
     try {
       
       if (dish === undefined) {
         throw new AppError(`O prato ${id} não existe`, 404);
       }
+
+      if(dish.image){
+        await diskStorage.deleteFile(dish.image);
+      }
+
+      let arrayIngredients = ingredients.split(",");
+
       const updateDish = await this.dishesService.renewDish(
         id,
         image,
@@ -187,7 +195,7 @@ class DishesService {
         id,
       });
       const updateIngredients = await this.dishesService.createIngredient(
-        ingredients,
+        arrayIngredients,
         user_id,
         id
       );

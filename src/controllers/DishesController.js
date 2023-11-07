@@ -8,13 +8,13 @@ class DishesController {
     const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
+    
     const {filename} = request.file
-
     const diskStorage = new DiskStorage();
+    const imageName = await diskStorage.saveFile(filename);
 
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
-    const imageName = await diskStorage.saveFile(filename);
 
     await dishesService.insert({
       image: imageName,
@@ -68,14 +68,14 @@ class DishesController {
     const { id } = request.params;
     const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
-    const {filename} = request.file
-    
+
+    const {filename} = request.file;
     const diskStorage = new DiskStorage();
     const imageName = await diskStorage.saveFile(filename);
 
 
     await dishesService.updateDish(id, {
-      imageName,
+      image: imageName,
       name,
       category,
       description,
@@ -86,6 +86,7 @@ class DishesController {
 
     return response.json({
       id,
+      imageName,
       name,
       category,
       description,

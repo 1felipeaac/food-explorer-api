@@ -12,7 +12,6 @@ const dishesController = new DishesController();
 
 dishRoutes.use(ensureAuthenticated);
 
-
 dishRoutes.post(
   "/",
   verifyUserAuthorization("admin"),
@@ -20,15 +19,6 @@ dishRoutes.post(
   dishesController.create
 );
 
-// dishRoutes.post(
-//   "/",
-//   verifyUserAuthorization("admin"),
-//   upload.single("dishImage"),
-//   (request, response) => {
-//     console.log(request.file.filename);
-//     response.json();
-//   }
-// );
 dishRoutes.get("/:id", dishesController.show);
 dishRoutes.delete(
   "/:id",
@@ -38,12 +28,9 @@ dishRoutes.delete(
 dishRoutes.put(
   "/:id",
   verifyUserAuthorization("admin"),
+  upload.single('image'),
   dishesController.update
 );
 dishRoutes.get("/", dishesController.index);
-dishRoutes.patch("/image", upload.single("image"), (request, response) => {
-  console.log(request.file.filename);
-  response.json();
-});
 
 module.exports = dishRoutes;
