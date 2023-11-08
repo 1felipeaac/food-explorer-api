@@ -25,7 +25,7 @@ dishRoutes.delete(
   verifyUserAuthorization("admin"),
   dishesController.delete
 );
-dishRoutes.put(
+dishRoutes.patch(
   "/:id",
   verifyUserAuthorization("admin"),
   upload.single('image'),
