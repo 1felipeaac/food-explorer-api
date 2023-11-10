@@ -103,7 +103,7 @@ class DishesRepository {
 
   async selectDish(name) {
     const dish = await knex("dishes")
-      .select(["dishes.id", "dishes.name", "dishes.description", "dishes.value"])
+      .select(["dishes.id", "dishes.name", "dishes.description", "dishes.value", "dishes.image"])
       .whereLike("name", `%${name}%`)
       .orderBy("name");
 
