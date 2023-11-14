@@ -48,6 +48,7 @@ class DishesRepository {
     const dish = await knex("dishes")
       .select([
         "dishes.image",
+        "dishes.id",
         "dishes.name",
         "dishes.category",
         "dishes.description",
@@ -56,13 +57,15 @@ class DishesRepository {
       .where({ id })
       .first();
 
-    const ingredients = await knex("ingredients")
+    const listIngredients = await knex("ingredients")
       .select(["ingredient"])
       .where({ dish_id: id })
       .orderBy("ingredient");
 
+    const ingredients = listIngredients.map((item) => item.ingredient);
+
     const result = {
-      ...{ dish },
+      ...dish,
       ingredients,
     };
 
@@ -86,24 +89,34 @@ class DishesRepository {
   }
 
   async listByIngredients(filterIngredients) {
-    const caseInsensitive = filterIngredients.map((ingredient) =>
-      ingredient.toLowerCase()
-    );
+    // const caseInsensitive = filterIngredients.map((ingredient) =>
+    //   ingredient.toLowerCase()
+    // );
+
+    const caseInsensitive = filterIngredients.toLowerCase();
 
     const dishes = await knex("ingredients")
-      .select(["ingredients.dish_id"])
+      .distinct("ingredients.dish_id")
       .whereLike("ingredient", `%${caseInsensitive}%`);
-    const dishesFound = dishes.map((dish) => this.dishFoundById(dish.dish_id));
 
-    const dishSelected = await Promise.all(dishesFound);
-    console.log(dishSelected);
+    const dishIds = dishes.map((dish) => dish.dish_id);
+    const dishSelected = await Promise.all(
+      dishIds.map((dishId) => this.dishFoundById(dishId))
+    );
 
     return dishSelected;
   }
 
   async selectDish(name) {
     const dish = await knex("dishes")
-      .select(["dishes.id", "dishes.name", "dishes.description", "dishes.value", "dishes.image"])
+      .select([
+        "dishes.image",
+        "dishes.id",
+        "dishes.name",
+        "dishes.category",
+        "dishes.description",
+        "dishes.value",
+      ])
       .whereLike("name", `%${name}%`)
       .orderBy("name");
 

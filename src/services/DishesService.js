@@ -1,7 +1,6 @@
 const AppError = require("../utils/AppError");
 const DiskStorage = require("../providers/DiskStorage");
 
-
 class DishesService {
   constructor(dishesService) {
     this.dishesService = dishesService;
@@ -35,13 +34,12 @@ class DishesService {
 
       return { dish, ingredientsCreated };
     } catch (error) {
-      // console.log(error.message)
       throw new AppError(error.message);
     }
   }
 
   async listDishById(id) {
-    const { dish, ingredients } = await this.dishesService.dishFoundById(id);
+    const dish = await this.dishesService.dishFoundById(id);
 
     try {
       if (dish === undefined) {
@@ -51,100 +49,51 @@ class DishesService {
         );
       }
 
-      const ingredientsMap = ingredients.map(
-        (ingredient) => ingredient.ingredient
-      );
-
-      return { id, dish, ingredients: ingredientsMap };
+      return { dish };
     } catch (error) {
       throw new AppError(error.message);
     }
   }
 
-  async listDishes(name, ingredients) {
+  async listDishes(name) {
     let dishes;
-    // console.log(name, ingredients);
     try {
-      if (!name && !ingredients) {
+      if (!name) {
         dishes = await this.dishesService.listById();
 
         return dishes;
-        // throw new AppError("Sem parametros para busca")
       }
 
-      if (!name) {
-        const filterIngredients = ingredients
-          .split(",")
-          .map((ingredient) => ingredient.trim());
+      const arrayDishes = await this.dishesService.selectDish(name);
+      const arrayIngredients = await this.dishesService.listByIngredients(name);
 
-        const dishesByIngredients = await this.dishesService.listByIngredients(
-          filterIngredients
-        );
+      if (arrayDishes.length > 0) {
+        dishes = arrayDishes;
+        const ingredientsSelected = await this.dishesService.allIngredients();
 
-        if (dishesByIngredients.length === 0) {
-          throw new AppError(
-            `Não existe prato com ingrediente ${filterIngredients}, ou o ingrediente está digitado de forma incorreta`,
-            404
-          );
-        }
-
-        const dishes = dishesByIngredients.map((dish) => {
-          const dishFound = dish.dish;
-          const listIngredientsFound = dish.ingredients;
-
-          const ingredientsMap = listIngredientsFound.map(
-            (ingredient) => ingredient.ingredient
+        const dishWithIngredients = dishes.map((dish) => {
+          const dishIngredients = ingredientsSelected.flatMap((ingredient) =>
+            ingredient.dish_id === dish.id ? ingredient.ingredient : []
           );
 
           return {
-            dish: dishFound,
-            ingredients: ingredientsMap,
+            ...dish,
+            ingredients: dishIngredients,
           };
         });
 
-        return dishes;
-      }
+        return dishWithIngredients;
+      } else {
+        if (arrayIngredients.length > 0) {
+          dishes = arrayIngredients;
 
-      if (ingredients) {
-        const filterIngredients = ingredients
-          .split(",")
-          .map((ingredient) => ingredient.trim());
-        dishes = await this.dishesService.linkDishesIngredients(
-          name,
-          filterIngredients
-        );
-
-        const [dishId] = dishes.map((dish) => dish.id);
-
-        if (dishId === undefined) {
+          return dishes;
+        } else {
           throw new AppError(
-            `O prato ${name} não possui o ingrediente ${filterIngredients}, ou o ingrediente está digitado de forma incorreta`,
-            404
+            `Não existe prato ou ingrediente com esse nome: ${name}`
           );
         }
-      } else {
-        dishes = await this.dishesService.selectDish(name);
-        // console.log("Objeto"+ Object.keys(dishes).length);
-
-        if (Object.keys(dishes).length === 0) {
-          throw new AppError(`Sem resultados para busca: ${name}`);
-        }
       }
-
-      const ingredientsSelected = await this.dishesService.allIngredients();
-
-      const dishWithIngredients = dishes.map((dish) => {
-        const dishIngredients = ingredientsSelected.flatMap((ingredient) =>
-          ingredient.dish_id === dish.id ? ingredient.ingredient : []
-        );
-
-        return {
-          ...dish,
-          ingredients: dishIngredients,
-        };
-      });
-
-      return dishWithIngredients;
     } catch (error) {
       throw new AppError(error.message);
     }
@@ -171,12 +120,11 @@ class DishesService {
     const dish = await this.dishesService.findDishById(id);
     const diskStorage = new DiskStorage();
     try {
-      
       if (dish === undefined) {
         throw new AppError(`O prato ${id} não existe`, 404);
       }
 
-      if(dish.image){
+      if (dish.image) {
         await diskStorage.deleteFile(dish.image);
       }
 

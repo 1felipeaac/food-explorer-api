@@ -8,8 +8,7 @@ class DishesController {
     const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
-    
-    const {filename} = request.file
+    const { filename } = request.file;
     const diskStorage = new DiskStorage();
     const imageName = await diskStorage.saveFile(filename);
 
@@ -36,17 +35,16 @@ class DishesController {
 
     const presentation = await dishesService.listDishById(id);
 
-    return response.json( presentation );
+    return response.json(presentation);
   }
   async index(request, response) {
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
 
-    const { name, ingredients } = request.query;
+    const { name } = request.query;
 
     const dishWithIngredients = await dishesService.listDishes(
-      name,
-      ingredients
+      name
     );
 
     return response.json(dishWithIngredients);
@@ -63,16 +61,14 @@ class DishesController {
   async update(request, response) {
     const dishesRepository = new DishesRepository();
     const dishesService = new DishesService(dishesRepository);
-    
-    
+
     const { id } = request.params;
     const { name, category, description, ingredients, value } = request.body;
     const user_id = request.user.id;
 
-    const {filename} = request.file;
+    const { filename } = request.file;
     const diskStorage = new DiskStorage();
     const imageName = await diskStorage.saveFile(filename);
-
 
     await dishesService.updateDish(id, {
       image: imageName,
