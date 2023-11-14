@@ -7,9 +7,9 @@ class SessionsController {
     const sessionRepository = new SessionRepository()
     const sessionService = new SessionService(sessionRepository)
     
-    const token = await sessionService.insert({email, password})
+    const user = await sessionService.insert({email, password, response})
     
-    return response.status(200).json(token);
+    return response.status(201).json({user});
   }
 }
 
