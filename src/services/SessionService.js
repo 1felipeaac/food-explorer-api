@@ -2,7 +2,6 @@ const { hash, compare } = require("bcryptjs");
 const AppError = require("../utils/AppError");
 const authConfig = require("../configs/auth");
 const { sign } = require("jsonwebtoken");
-const { response } = require("express");
 
 class SessionService {
   constructor(sessionRepository) {
@@ -32,7 +31,7 @@ class SessionService {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 15 * 60 * 1000,
+      // maxAge: 15 * 60 * 1000,
     });
 
     delete user.password;
