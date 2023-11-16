@@ -3,8 +3,6 @@ const UserService = require("../services/UsersService");
 
 class UsersController {
   async create(request, response) {
-    // #swagger.tags = ['User']
-    // #swagger.description = 'Endpoint para obter um usuário.'
     const { name, email, password } = request.body;
 
     const userRepository = new UserRepository();
