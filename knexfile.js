@@ -3,7 +3,7 @@ require('dotenv').config({ path: "../.env" });
 module.exports = {
 
   development: {
-    client: process.env.CLIENT,
+    client: 'sqlite3',
     connection: {
       filename: path.resolve(__dirname, "src", "database", "database.db")
     },
