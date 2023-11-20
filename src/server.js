@@ -1,4 +1,4 @@
-// require('dotenv/config')
+require('dotenv/config')
 require("express-async-errors")
 
 const migrationsRun = require("./database/sqlite/migrations")
@@ -20,7 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://webfoodexplorer.netlify.app/'],
     credentials: true
 }));
 
