@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
     origin: [
-        'https://webfoodexplorer.netlify.app/',
+        'https://webfoodexplorer.netlify.app',
         'http://localhost:5173', 
         'http://127.0.0.1:5173'
     ],
